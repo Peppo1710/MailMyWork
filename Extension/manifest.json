@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "PingUp",
+  "version": "1.0",
+  "description": "Daily todo summary sender",
+  "permissions": ["storage", "alarms","http://localhost:3000/api/todos"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_popup": "login.html"
+  }
+}

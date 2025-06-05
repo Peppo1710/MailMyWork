@@ -1,0 +1,165 @@
+:root {
+  --bg-color: #1e1e2f;
+  --card-color: #2a2a40;
+  --accent: #ff79c6;
+  --text-color: #f8f8f2;
+  --muted: #888;
+  --error-color: #ff5555;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  width: 300px;
+  max-height: 480px;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px;
+}
+
+.view {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+
+.view.active {
+  display: flex;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 20px;
+  margin: 0 0 16px 0;
+  text-align: center;
+  user-select: none;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--card-color);
+  color: var(--text-color);
+  margin-bottom: 12px;
+  outline: none;
+  width: 100%;
+}
+
+input::placeholder {
+  color: var(--muted);
+}
+
+button {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button.secondary {
+  background-color: transparent;
+  color: var(--muted);
+  border: 1px solid var(--muted);
+}
+
+button.secondary:hover {
+  background-color: var(--muted);
+  color: var(--bg-color);
+}
+
+button:hover {
+  background-color: #e55dbb;
+}
+
+ul#taskList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: 200px;
+}
+
+ul#taskList li {
+  background: var(--card-color);
+  margin-bottom: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  user-select: none;
+}
+
+ul#taskList li button.deleteBtn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 6px;
+  line-height: 1;
+  user-select: none;
+}
+
+ul#taskList li button.deleteBtn:hover {
+  color: #ff5555;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  flex-wrap: nowrap;
+}
+
+.alert {
+  color: var(--error-color);
+  font-size: 13px;
+  text-align: center;
+  margin-top: 6px;
+  user-select: none;
+}
+
+/* Scrollbar for task list */
+ul#taskList::-webkit-scrollbar {
+  width: 6px;
+}
+
+ul#taskList::-webkit-scrollbar-track {
+  background: var(--card-color);
+  border-radius: 3px;
+}
+
+ul#taskList::-webkit-scrollbar-thumb {
+  background-color: var(--accent);
+  border-radius: 3px;
+}
+
+/* Alert box for warnings - small and not breaking layout */
+.alert {
+  max-width: 100%;
+  word-wrap: break-word;
+}

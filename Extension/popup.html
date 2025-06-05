@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PingUp - Popup</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Login View -->
+    <section id="loginView" class="view active">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email" autocomplete="username" />
+      <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" />
+      <button id="loginBtn">Login</button>
+      <div id="loginAlert" class="alert" hidden></div>
+    </section>
+
+    <!-- Todos View -->
+<section id="todosView" class="view">
+  <h2>Tasks</h2>
+  <input type="text" id="taskInput" placeholder="Add new task..." />
+  <ul id="taskList"></ul>
+  <div class="footer">
+    <button id="sendEmailBtn" style="background-color:#2e7d32; color:white; padding:6px 12px; margin-right: 8px; border:none; border-radius:4px; cursor:pointer; font-size:14px;">
+      Send Email
+    </button>
+    <button id="changeRecipientsBtn">Edit Recipients</button>
+    <button id="logoutBtn" class="secondary">Logout</button>
+  </div>
+  <div id="todosAlert" class="alert" hidden></div>
+</section>
+
+
+    <!-- Recipients View -->
+    <section id="recipientsView" class="view">
+      <h2>Edit Recipients</h2>
+      <input type="email" id="toEmail" placeholder="To Email" />
+      <input type="email" id="ccEmail" placeholder="CC Email (optional)" />
+      <input type="email" id="bccEmail" placeholder="BCC Email (optional)" />
+      <div class="footer">
+        <button id="saveRecipientsBtn">Save</button>
+        <button id="backToTodosBtn" class="secondary">Back</button>
+      </div>
+      <div id="recipientsAlert" class="alert" hidden></div>
+    </section>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

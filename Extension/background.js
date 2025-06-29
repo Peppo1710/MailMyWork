@@ -1,66 +1,77 @@
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.alarms.create("dailyReminder", {
-    when: getNext5_59PM(),
-    periodInMinutes: 1440,
-  });
+import StorageManager from './utils/storage.js';
+
+chrome.runtime.onInstalled.addListener(async () => {
+  // Clear any existing alarms
+  await chrome.alarms.clearAll();
+  
+  // Check if auto-send is enabled
+  const settings = await StorageManager.getEmailSettings();
+  if (settings.autoSendEnabled) {
+    chrome.alarms.create("dailyReminder", {
+      when: getNext6PM(),
+      periodInMinutes: 1440,
+    });
+  }
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name !== "dailyReminder") return;
 
-  const {
-    tasks = [],
-    emailOn,
-    senderEmail,
-    appPassword,
-    toEmail,
-    ccEmail,
-    bccEmail,
-  } = await chromeStorageGet([
-    "tasks",
-    "emailOn",
-    "senderEmail",
-    "appPassword",
-    "toEmail",
-    "ccEmail",
-    "bccEmail",
-  ]);
+  // Check if auto-send is still enabled
+  const settings = await StorageManager.getEmailSettings();
+  if (!settings.autoSendEnabled) return;
 
-  if (!emailOn || !tasks.length || !senderEmail || !appPassword || !toEmail) return;
+  // Get todos and credentials
+  const todos = await StorageManager.getTodos();
+  const decryptedPassword = await StorageManager.getDecryptedPassword();
+  const context = await StorageManager.getEmailContext();
+  
+  // Get sender email from storage
+  const authData = await new Promise((resolve) => {
+    chrome.storage.local.get(['email'], resolve);
+  });
 
-  // Extract only the text from each task into an array of strings
-  const todos = tasks.map((t) => t.text);
+  if (!todos.length || !decryptedPassword || !settings.toEmail || !authData.email) return;
 
-  // Prepare the JSON body as per your required format
+  // Extract todo texts
+  const todoTexts = todos.map(todo => `${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+
+  // Prepare the JSON body
   const body = {
-    todos,
+    todos: todoTexts,
     sendEmail: true,
-    senderEmail,
-    smtpPass: appPassword,
-    to: toEmail,
-    cc: ccEmail || "",
-    bcc: bccEmail || "",
+    senderEmail: authData.email,
+    smtpPass: decryptedPassword,
+    to: settings.toEmail,
+    cc: settings.ccEmail || "",
+    bcc: settings.bccEmail || "",
+    context: context || ""
   };
 
   try {
-    await fetch("http://localhost:3000/api/todos", {
+    const response = await fetch("http://localhost:3000/api/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+
+    if (response.ok) {
+      console.log("Daily email sent successfully");
+      // Clear completed todos after successful send
+      const updatedTodos = todos.filter(todo => !todo.completed);
+      await StorageManager.saveTodos(updatedTodos);
+    } else {
+      console.error("Failed to send daily email:", await response.text());
+    }
   } catch (error) {
     console.error("Failed to send daily email:", error);
   }
 });
 
-function chromeStorageGet(keys) {
-  return new Promise((resolve) => chrome.storage.local.get(keys, resolve));
-}
-
-function getNext5_59PM() {
+function getNext6PM() {
   const now = new Date();
   const target = new Date();
-  target.setHours(17, 59, 0, 0);
+  target.setHours(18, 0, 0, 0);
   if (now > target) target.setDate(target.getDate() + 1);
   return target.getTime();
 }

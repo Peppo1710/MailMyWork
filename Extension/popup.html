@@ -3,50 +3,144 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PingUp - Popup</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>PingUp - Daily Todo Summary</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <div id="app">
-    <!-- Login View -->
-    <section id="loginView" class="view active">
-      <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email" autocomplete="username" />
-      <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" />
-      <button id="loginBtn">Login</button>
-      <div id="loginAlert" class="alert" hidden></div>
-    </section>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>PingUp</h1>
+      <p>Daily Todo Summary Sender</p>
+    </div>
 
-    <!-- Todos View -->
-<section id="todosView" class="view">
-  <h2>Tasks</h2>
-  <input type="text" id="taskInput" placeholder="Add new task..." />
-  <ul id="taskList"></ul>
-  <div class="footer">
-    <button id="sendEmailBtn" style="background-color:#2e7d32; color:white; padding:6px 12px; margin-right: 8px; border:none; border-radius:4px; cursor:pointer; font-size:14px;">
-      Send Email
-    </button>
-    <button id="changeRecipientsBtn">Edit Recipients</button>
-    <button id="logoutBtn" class="secondary">Logout</button>
-  </div>
-  <div id="todosAlert" class="alert" hidden></div>
-</section>
-
-
-    <!-- Recipients View -->
-    <section id="recipientsView" class="view">
-      <h2>Edit Recipients</h2>
-      <input type="email" id="toEmail" placeholder="To Email" />
-      <input type="email" id="ccEmail" placeholder="CC Email (optional)" />
-      <input type="email" id="bccEmail" placeholder="BCC Email (optional)" />
-      <div class="footer">
-        <button id="saveRecipientsBtn">Save</button>
-        <button id="backToTodosBtn" class="secondary">Back</button>
+    <!-- Authentication View -->
+    <section id="authView" class="view active">
+      <div class="form-group">
+        <label for="authEmail">Email Address</label>
+        <input type="email" id="authEmail" placeholder="Enter your Gmail address" />
       </div>
-      <div id="recipientsAlert" class="alert" hidden></div>
+      <div class="form-group">
+        <label for="authPassword">App Password</label>
+        <input type="password" id="authPassword" placeholder="Enter your 16-character app password" maxlength="16" />
+        <small style="color: var(--text-muted); font-size: 12px; margin-top: 4px; display: block;">
+          Use Gmail App Password (not your regular password)
+        </small>
+      </div>
+      <button id="loginBtn" class="btn btn-primary btn-lg" style="width: 100%;">
+        <span id="loginBtnText">Login</span>
+        <span id="loginBtnLoading" class="loading" style="display: none;"></span>
+      </button>
+      <div id="authAlert" class="alert"></div>
+    </section>
+
+    <!-- Main App View -->
+    <section id="appView" class="view">
+      <!-- Navigation Tabs -->
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="todos">Todos</button>
+        <button class="nav-tab" data-tab="credentials">Recipients</button>
+        <button class="nav-tab" data-tab="context">Email Context</button>
+      </div>
+
+      <!-- Todos Tab -->
+      <div id="todosTab" class="tab-content active">
+        <div class="form-group">
+          <label for="todoTitle">Task Title</label>
+          <input type="text" id="todoTitle" placeholder="Enter task title..." />
+        </div>
+        <div class="form-group">
+          <label for="todoDescription">Description (optional)</label>
+          <textarea id="todoDescription" placeholder="Enter task description..."></textarea>
+        </div>
+        <button id="addTodoBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">
+          Add Task
+        </button>
+
+        <div class="todo-list" id="todoList">
+          <!-- Todos will be rendered here -->
+        </div>
+
+        <div class="footer">
+          <div class="footer-left">
+            <label class="toggle-switch">
+              <input type="checkbox" id="autoSendToggle" />
+              <span class="toggle-slider"></span>
+            </label>
+            <span style="font-size: 14px; color: var(--text-muted);">Auto-send at 6 PM</span>
+          </div>
+          <div class="footer-right">
+            <button id="sendEmailBtn" class="btn btn-success btn-sm">
+              Send Email
+            </button>
+            <button id="logoutBtn" class="btn btn-secondary btn-sm">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Credentials Tab -->
+      <div id="credentialsTab" class="tab-content">
+        <div class="form-group">
+          <label for="toEmail">To Email</label>
+          <input type="email" id="toEmail" placeholder="recipient@example.com" />
+        </div>
+        <div class="form-group">
+          <label for="ccEmail">CC Email (optional)</label>
+          <input type="email" id="ccEmail" placeholder="cc@example.com" />
+        </div>
+        <div class="form-group">
+          <label for="bccEmail">BCC Email (optional)</label>
+          <input type="email" id="bccEmail" placeholder="bcc@example.com" />
+        </div>
+        <button id="saveCredentialsBtn" class="btn btn-primary" style="width: 100%;">
+          Save Recipients
+        </button>
+        <div id="credentialsAlert" class="alert"></div>
+      </div>
+
+      <!-- Context Tab -->
+      <div id="contextTab" class="tab-content">
+        <div class="form-group">
+          <label for="emailContext">Email Context & Format</label>
+          <textarea id="emailContext" placeholder="Enter your email context and format instructions...">Please write a professional daily update email summarizing the following todos. The email should start with:
+
+Dear Sir,
+
+Then a brief line like:
+"Here are the updates for today's report:"
+
+Next, combine all the todos into a cohesive summary divided into the following sections exactly as shown, with the labels followed by content on the same line (no bullet points):
+
+EPIC: [Provide a general EPIC that covers all the todos]
+
+User Story: [Describe the main User Story that reflects the overall work]
+
+Task: [Write a concise update summarizing progress on all the todos]
+
+End the email with:
+
+Best regards,
+[Your Name]
+
+Keep the tone formal, concise, and avoid including any subject line or bullet points.</textarea>
+        </div>
+        <button id="saveContextBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">
+          Save Context
+        </button>
+        <button id="generatePreviewBtn" class="btn btn-secondary" style="width: 100%; margin-bottom: 16px;">
+          Generate Preview
+        </button>
+        
+        <div id="emailPreview" class="email-preview" style="display: none;">
+          <h4>Email Preview</h4>
+          <div id="emailContent" class="email-content"></div>
+        </div>
+        
+        <div id="contextAlert" class="alert"></div>
+      </div>
     </section>
   </div>
 
-  <script src="popup.js"></script>
+  <script type="module" src="js/popup.js"></script>
 </body>
 </html>

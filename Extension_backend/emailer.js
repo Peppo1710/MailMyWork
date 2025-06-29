@@ -21,6 +21,7 @@ export default async function handler(req, res) {
     to = "",
     cc = "",
     bcc = "",
+    context = ""
   } = req.body;
 
   console.log("Received todos:", todos);
@@ -41,13 +42,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Build prompt for Gemini using raw todos
-    const prompt = `Please write a professional daily update email summarizing the following todos. The email should start with:
+    // Use custom context if provided, otherwise use default
+    const prompt = context || `Please write a professional daily update email summarizing the following todos. The email should start with:
 
 Dear Sir,
 
 Then a brief line like:
-"Here are the updates for today’s report:"
+"Here are the updates for today's report:"
 
 Next, combine all the todos into a cohesive summary divided into the following sections exactly as shown, with the labels followed by content on the same line (no bullet points):
 
@@ -55,7 +56,7 @@ EPIC: [Provide a general EPIC that covers all the todos]
 
 User Story: [Describe the main User Story that reflects the overall work]
 
-Update: [Write a concise update summarizing progress on all the todos]
+Task: [Write a concise update summarizing progress on all the todos]
 
 End the email with:
 
@@ -82,13 +83,11 @@ ${todos.map((todo, i) => `${i + 1}. ${todo}`).join("\n")}
     console.log("Gemini response received");
 
     const result = geminiResponse.data.candidates?.[0]?.content?.parts?.[0]?.text || "No output";
-    console.log("Rephrased result:", result);
+    console.log("Generated result:", result);
 
     // Send email if requested
     if (sendEmail) {
       console.log("Preparing to send email...");
-      console.log((smtpPass));
-      
 
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -99,12 +98,12 @@ ${todos.map((todo, i) => `${i + 1}. ${todo}`).join("\n")}
       });
 
       await transporter.sendMail({
-        from: `"Todo Bot" <${senderEmail}>`,
+        from: `"PingUp Daily Summary" <${senderEmail}>`,
         to,
         cc: cc || undefined,
         bcc: bcc || undefined,
-        subject: "Your Rephrased Todos for Today",
-        html: `<pre style="font-family: monospace;">${result}</pre>`,
+        subject: "Daily Work Update - " + new Date().toLocaleDateString(),
+        html: `<pre style="font-family: monospace; white-space: pre-wrap;">${result}</pre>`,
       });
 
       console.log("Email sent successfully");

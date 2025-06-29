@@ -1,14 +1,27 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "PingUp",
   "version": "1.0",
-  "description": "Daily todo summary sender",
-  "permissions": ["storage", "alarms","http://localhost:3000/api/todos"],
+  "description": "Daily todo summary sender with AI-powered email generation",
+  "permissions": [
+    "storage", 
+    "alarms",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*"
+  ],
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js",
+    "type": "module"
   },
-  "browser_action": {
-    "default_popup": "login.html"
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PingUp - Daily Todo Summary"
+  },
+  "icons": {
+    "16": "icons.png",
+    "48": "icons.png",
+    "128": "icons.png"
   }
 }

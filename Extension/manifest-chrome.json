@@ -12,20 +12,16 @@
     "http://localhost:3000/*"
   ],
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup.html",
     "default_title": "PingUp - Daily Todo Summary"
   },
   "icons": {
-    "16": "icons.png",  // Must be square (e.g., 16x16)
-    "48": "icons.png",  // Must be square (e.g., 48x48)
-    "128": "icons.png"  // Must be square (e.g., 128x128)
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "pingup-addon@example.com"
-    }
+    "16": "icons.png",
+    "48": "icons.png",
+    "128": "icons.png"
   }
-} 
+}

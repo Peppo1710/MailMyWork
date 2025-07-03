@@ -42,8 +42,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Use custom context if provided, otherwise use default
-    const prompt = context || `Please write a professional daily update email summarizing the following todos. The email should start with:
+    // Separate incomplete and completed todos
+    const incompleteTodos = todos.filter(todo => !todo.startsWith('✓ '));
+    const completedTodos = todos.filter(todo => todo.startsWith('✓ ')).map(todo => todo.substring(2)); // Remove ✓ prefix
+    
+    // Extract EPIC and User Story from context
+    let epic = '';
+    let userStory = '';
+    
+    if (context) {
+      const epicMatch = context.match(/EPIC:\s*(.+?)(?:\n|$)/i);
+      const userStoryMatch = context.match(/User Story:\s*(.+?)(?:\n|$)/i);
+      
+      if (epicMatch) epic = epicMatch[1].trim();
+      if (userStoryMatch) userStory = userStoryMatch[1].trim();
+    }
+    
+    // Create the improved prompt
+    const prompt = `Please write a professional daily update email summarizing the following todos. The email should start with:
 
 Dear Sir,
 
@@ -52,9 +68,9 @@ Then a brief line like:
 
 Next, combine all the todos into a cohesive summary divided into the following sections exactly as shown, with the labels followed by content on the same line (no bullet points):
 
-EPIC: [Provide a general EPIC that covers all the todos]
+EPIC: ${epic || '[EPIC]'}
 
-User Story: [Describe the main User Story that reflects the overall work]
+User Story: ${userStory || '[User Story]'}
 
 Task: [Write a concise update summarizing progress on all the todos]
 
@@ -63,12 +79,14 @@ End the email with:
 Best regards,
 Pradyumn
 
-Keep the tone formal, concise, and avoid including any subject line or bullet points.
+IMPORTANT REMINDERS:
+- Epic and User Story will be provided by user only, so don't elongate it, just copy paste it by formatting it properly
+- When it comes to tasks, take the completed tasks and generate a numbered list and put it in a progress or task section
+- Keep it small like 10-20 words per task, don't do anything more than that
+- Keep the tone formal, concise, and avoid including any subject line or bullet points
 
-Todos:
-${todos.map((todo, i) => `${i + 1}. ${todo}`).join("\n")}
-
-`;
+Completed tasks to include:
+${completedTodos.length > 0 ? completedTodos.map((todo, i) => `${i + 1}. ${todo}`).join('\n') : 'No completed tasks today.'}`;
 
     console.log("Prompt for Gemini:", prompt);
 
@@ -111,7 +129,7 @@ ${todos.map((todo, i) => `${i + 1}. ${todo}`).join("\n")}
       console.log("Skipping email send");
     }
 
-    return res.status(200).json({ success: true, result });
+    return res.status(200).json({ success: true, result: result });
   } catch (err) {
     console.error("Error occurred:", err);
     return res.status(500).json({ success: false, error: "Server error" });

@@ -33,12 +33,23 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
   if (!todos.length || !decryptedPassword || !settings.toEmail || !authData.email) return;
 
-  // Extract todo texts
-  const todoTexts = todos.map(todo => `${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+  // Separate incomplete and completed todos
+  const incompleteTodos = todos.filter(todo => !todo.completed);
+  const completedTodos = todos.filter(todo => todo.completed);
+  
+  // Format todos for email
+  const incompleteTodoTexts = incompleteTodos.map(todo => `${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+  const completedTodoTexts = completedTodos.map(todo => `✓ ${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+  
+  // Combine all todos for email
+  const allTodoTexts = [...incompleteTodoTexts, ...completedTodoTexts];
+
+  // Don't send email if no todos at all
+  if (!allTodoTexts.length) return;
 
   // Prepare the JSON body
   const body = {
-    todos: todoTexts,
+    todos: allTodoTexts,
     sendEmail: true,
     senderEmail: authData.email,
     smtpPass: decryptedPassword,
@@ -57,9 +68,8 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
     if (response.ok) {
       console.log("Daily email sent successfully");
-      // Clear completed todos after successful send
-      const updatedTodos = todos.filter(todo => !todo.completed);
-      await StorageManager.saveTodos(updatedTodos);
+      // Clear all todos after successful send (both completed and incomplete)
+      await StorageManager.saveTodos([]);
     } else {
       console.error("Failed to send daily email:", await response.text());
     }

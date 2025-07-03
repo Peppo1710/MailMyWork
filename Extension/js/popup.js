@@ -380,13 +380,29 @@ class PingUpApp {
     this.generatePreviewBtn.innerHTML = '<span class="loading"></span> Generating...';
     
     try {
-      const todoTexts = this.todos.map(todo => `${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+      // Separate incomplete and completed todos
+      const incompleteTodos = this.todos.filter(todo => !todo.completed);
+      const completedTodos = this.todos.filter(todo => todo.completed);
+      
+      // Format todos for email
+      const incompleteTodoTexts = incompleteTodos.map(todo => `${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+      const completedTodoTexts = completedTodos.map(todo => `✓ ${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+      
+      // Combine all todos for email
+      const allTodoTexts = [...incompleteTodoTexts, ...completedTodoTexts];
+      const context = this.emailContext.value.trim();
+      
+      // Don't send email if no todos at all
+      if (!allTodoTexts.length) {
+        this.showAlert(this.contextAlert, 'No tasks to send.');
+        return;
+      }
       
       const response = await fetch('http://localhost:3000/api/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          todos: todoTexts,
+          todos: allTodoTexts,
           sendEmail: false,
           context: context
         }),
@@ -452,14 +468,29 @@ class PingUpApp {
     this.sendEmailBtn.style.animation = 'pulse 1.5s infinite';
     
     try {
-      const todoTexts = this.todos.map(todo => `${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+      // Separate incomplete and completed todos
+      const incompleteTodos = this.todos.filter(todo => !todo.completed);
+      const completedTodos = this.todos.filter(todo => todo.completed);
+      
+      // Format todos for email
+      const incompleteTodoTexts = incompleteTodos.map(todo => `${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+      const completedTodoTexts = completedTodos.map(todo => `✓ ${todo.title}${todo.description ? `: ${todo.description}` : ''}`);
+      
+      // Combine all todos for email
+      const allTodoTexts = [...incompleteTodoTexts, ...completedTodoTexts];
       const context = this.emailContext.value.trim();
+      
+      // Don't send email if no todos at all
+      if (!allTodoTexts.length) {
+        this.showAlert(this.contextAlert, 'No tasks to send.');
+        return;
+      }
       
       const response = await fetch('http://localhost:3000/api/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          todos: todoTexts,
+          todos: allTodoTexts,
           sendEmail: true,
           senderEmail: authData.email,
           smtpPass: decryptedPassword,
@@ -486,8 +517,8 @@ class PingUpApp {
         // Show success message
         this.showAlert(this.contextAlert, 'Email sent successfully!', 'success');
         
-        // Clear completed todos
-        this.todos = this.todos.filter(todo => !todo.completed);
+        // Clear all todos after successful send (both completed and incomplete)
+        this.todos = [];
         await StorageManager.saveTodos(this.todos);
         this.renderTodos();
         

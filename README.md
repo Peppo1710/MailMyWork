@@ -77,14 +77,28 @@ Start the server:
 npm start
 ```
 
-### 2. Chrome Extension Setup
+### 2. Gemini API Key Setup
+
+To use the AI-powered email generation, you need a Gemini API key.
+
+1. Go to the [Google AI Gemini API Console](https://aistudio.google.com/app/apikey) to generate your API key.
+2. Create a `.env` file in the `Extension_backend` directory (if you haven't already) and add the following:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+PORT=3000
+```
+
+Replace `your_gemini_api_key_here` with the API key you obtained from the Gemini API Console.
+
+### 3. Chrome Extension Setup
 
 1. Open Chrome and go to `chrome://extensions/`
 2. Enable "Developer mode"
 3. Click "Load unpacked" and select the `Extension` folder
 4. The PingUp extension should now appear in your extensions list
 
-### 3. Gmail App Password Setup
+### 4. Gmail App Password Setup
 
 1. Go to your Google Account settings
 2. Navigate to Security → 2-Step Verification

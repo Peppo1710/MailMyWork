@@ -20,6 +20,12 @@ app.use((req, res, next) => {
 app.post("/api/todos", async (req, res) => {
   await handler(req, res);
 });
+app.post("/", async (req, res) => {
+  res.json({
+    msg: "Lund"
+  });
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

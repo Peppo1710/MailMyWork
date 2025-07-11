@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     if (!senderEmail || !smtpPass || !to) {
       return res.status(400).json({
         error: "senderEmail, smtpPass, and to fields are required when sendEmail is true",
+        senderEmail,smtpPass,to
       });
     }
   }

@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 
-import handler from "./emailer.js"; // adjust path if needed
+// import handler from "./emailer.js"; // adjust path if needed
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,9 +17,9 @@ app.use((req, res, next) => {
 });
 
 
-app.post("/api/todos", async (req, res) => {
-  await handler(req, res);
-});
+// app.post("/api/todos", async (req, res) => {
+//   await handler(req, res);
+// });
 app.post("/", async (req, res) => {
   res.json({
     msg: "Lund"

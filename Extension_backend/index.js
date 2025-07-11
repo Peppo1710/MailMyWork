@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 // app.post("/api/todos", async (req, res) => {
 //   await handler(req, res);
 // });
-app.post("/", async (req, res) => {
+app.get("/", async (req, res) => {
   res.json({
     msg: "Lund"
   });
